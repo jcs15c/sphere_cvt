@@ -1,49 +1,111 @@
 import spherical_utils
 import math
 import numpy as np
+from scipy.spatial import Delaunay
+import matplotlib.pyplot as plt
+
 
 def cvt_step(generators, M):
-	
-	bins, energy = bin_points(generators, M)
-	
-	for i in range(0, len(generators)):
-		generators[i] = spherical_utils.project_to_unit_sphere(
-										compute_center_of_mass(bins[i]))
-	
+     
+     bins, energy = bin_points(generators, M)
+     
+     for i in range(0, len(generators)):
+          generators[i] = spherical_utils.project_to_unit_sphere(
+                                                  compute_center_of_mass(bins[i]))
+     
 def compute_center_of_mass(b):
-	
-	x1 = 0;
-	y1 = 0;
-	z1 = 0;
-	
-	for x in b:
-		x1 += x[0]/len(b)
-		y1 += x[1]/len(b)
-		z1 += x[2]/len(b)
-		
-	return np.array([x1,y1,z1])
-		
+     
+     x1 = 0;
+     y1 = 0;
+     z1 = 0;
+     
+     for x in b:
+          x1 += x[0]/len(b)
+          y1 += x[1]/len(b)
+          z1 += x[2]/len(b)
+          
+     return np.array([x1,y1,z1])
+          
 def bin_points(generators, M):
-	
-	# create M uniform test points
-	x = spherical_utils.uniform_sample(M)
-	
-	bins = [ [] for x in range(len(generators))]
-	energy = 0
-	
-	for xi in x:
-		
-		d = math.inf
-		bi = -1
-		
-		for i in range(0,len(generators)):
-			
-			di = spherical_utils.distance_euclidean(xi,generators[i])
-			if (di < d):
-				d = di
-				bi = i
-		
-		bins[bi].append(xi)
-		energy += spherical_utils.distance_euclidean(xi, generators[bi])
-		
-	return bins, energy
+     
+     # create M uniform test points
+     x = spherical_utils.uniform_sample(M)
+     
+     bins = [ [] for x in range(len(generators))]
+     energy = 0
+     
+     for xi in x:
+          
+          d = math.inf
+          bi = -1
+          
+          for i in range(0,len(generators)):
+               
+               di = spherical_utils.distance_euclidean(xi,generators[i])
+               if (di < d):
+                    d = di
+                    bi = i
+          
+          bins[bi].append(xi)
+          energy += spherical_utils.distance_euclidean(xi, generators[bi])
+          
+     return bins, energy
+
+def compute_delaunay(generators, full = 0):
+    pts_upp = []
+    pts_low = []
+    gen_upp = []
+    gen_low = []
+    
+    for i in range(len(generators)):
+        if generators[i][2] > 0:
+            pts_upp.append(spherical_utils.project_onto_upper_plane(generators[i])[:2])
+            gen_upp.append(generators[i])
+        else:
+            pts_low.append(spherical_utils.project_onto_lower_plane(generators[i])[:2])
+            gen_low.append(generators[i])
+
+    tri_upp = Delaunay(pts_upp)
+    tri_low = Delaunay(pts_low)    
+    
+    if full:
+        return tri_upp.simplices.copy(), tri_low.simplices.copy(), gen_upp, gen_low
+    return tri_upp.simplices.copy(), tri_low.simplices.copy()
+
+def plot_delaunay(ax, generators):
+    tri_upp, tri_low, gen_upp, gen_low = compute_delaunay(generators, True)
+    
+    for tri in tri_upp:
+        spherical_utils.sphere_line(ax, gen_upp[tri[0]], gen_upp[tri[1]])
+        spherical_utils.sphere_line(ax, gen_upp[tri[1]], gen_upp[tri[2]])
+        spherical_utils.sphere_line(ax, gen_upp[tri[2]], gen_upp[tri[0]])
+    
+    for tri in tri_low:
+        spherical_utils.sphere_line(ax, gen_low[tri[0]], gen_low[tri[1]])
+        spherical_utils.sphere_line(ax, gen_low[tri[1]], gen_low[tri[2]])
+        spherical_utils.sphere_line(ax, gen_low[tri[2]], gen_low[tri[0]])
+    
+    spherical_utils.disp_sphere(ax)
+
+
+#Performs delaunay with only one tangent plane
+def plot_delaunay_ill(ax, generators):
+    pts = []    
+    
+    for i in range(len(generators)):
+        pts.append(spherical_utils.project_onto_upper_plane(generators[i])[:2])
+        
+    tri = Delaunay(pts)
+    
+    inds = tri.simplices.copy()
+    
+    for ind in inds:
+        spherical_utils.sphere_line(ax, generators[ind[0]], generators[ind[1]])
+        spherical_utils.sphere_line(ax, generators[ind[1]], generators[ind[2]])
+        spherical_utils.sphere_line(ax, generators[ind[2]], generators[ind[0]])
+        
+    spherical_utils.disp_sphere(ax)
+
+
+
+

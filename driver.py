@@ -1,19 +1,26 @@
 import spherical_utils
 import spherical_cvt
 
-N = 12
+N = 50
 M = 1000
 generators = spherical_utils.uniform_sample(N)
 
-spherical_utils.plot_on_sphere(generators)
+ax = spherical_utils.init_sphere()
+
+spherical_utils.sphere_points(ax, generators)
+spherical_cvt.plot_delaunay(ax,generators)
 
 
 bins, energy = spherical_cvt.bin_points(generators, M)
 print(energy)
 
-for k in range(10):
-	spherical_cvt.cvt_step(generators, M)
-	bins, energy = spherical_cvt.bin_points(generators, M)
-	print(energy)
+for k in range(15):
+     spherical_cvt.cvt_step(generators, M)
+     bins, energy = spherical_cvt.bin_points(generators, M)
 
-spherical_utils.plot_on_sphere(generators)
+print(energy)
+
+ax = spherical_utils.init_sphere()
+
+spherical_utils.sphere_points(ax, generators)
+spherical_cvt.plot_delaunay(ax, generators)
