@@ -51,6 +51,7 @@ def bin_points(generators, M):
           
      return bins, energy
 
+#Returns indicies of delaunay triangles
 def compute_delaunay(generators, full = 0):
     pts_upp = []
     pts_low = []
@@ -58,36 +59,62 @@ def compute_delaunay(generators, full = 0):
     gen_low = []
     
     for i in range(len(generators)):
-        if generators[i][2] > 0:
+        if np.arccos(np.dot([0,0,1],generators[i])) <= 3 * np.pi / 4:
             pts_upp.append(spherical_utils.project_onto_upper_plane(generators[i])[:2])
             gen_upp.append(generators[i])
-        else:
+        if np.arccos(np.dot([0,0,-1],generators[i])) <= 3 * np.pi / 4:
             pts_low.append(spherical_utils.project_onto_lower_plane(generators[i])[:2])
             gen_low.append(generators[i])
 
-    tri_upp = Delaunay(pts_upp)
-    tri_low = Delaunay(pts_low)    
+    tri_upp = Delaunay(pts_upp).simplices.copy()
+    tri_low = Delaunay(pts_low).simplices.copy()
     
+    #plot_2d_delaunay(pts_upp, tri_upp)
+    
+    tri_upp = remove_ill_tri(tri_upp, pts_upp, [0,0], 3 * np.pi / 4)
+    tri_low = remove_ill_tri(tri_low, pts_low, [0,0], 3 * np.pi / 4)
+
+    #plot_2d_delaunay(pts_upp, tri_upp)
+
     if full:
-        return tri_upp.simplices.copy(), tri_low.simplices.copy(), gen_upp, gen_low
-    return tri_upp.simplices.copy(), tri_low.simplices.copy()
+        return tri_upp, tri_low, gen_upp, gen_low
+    return tri_upp, tri_low
 
 def plot_delaunay(ax, generators):
-    tri_upp, tri_low, gen_upp, gen_low = compute_delaunay(generators, True)
+    tri_upp, tri_low, gen_upp, gen_low \
+            = compute_delaunay(generators, True)
+        
+    for tri in tri_low:
+        spherical_utils.sphere_line(ax, gen_low[tri[0]], gen_low[tri[1]], 'b')
+        spherical_utils.sphere_line(ax, gen_low[tri[1]], gen_low[tri[2]], 'b')
+        spherical_utils.sphere_line(ax, gen_low[tri[2]], gen_low[tri[0]], 'b')
     
     for tri in tri_upp:
-        spherical_utils.sphere_line(ax, gen_upp[tri[0]], gen_upp[tri[1]])
-        spherical_utils.sphere_line(ax, gen_upp[tri[1]], gen_upp[tri[2]])
-        spherical_utils.sphere_line(ax, gen_upp[tri[2]], gen_upp[tri[0]])
-    
-    for tri in tri_low:
-        spherical_utils.sphere_line(ax, gen_low[tri[0]], gen_low[tri[1]])
-        spherical_utils.sphere_line(ax, gen_low[tri[1]], gen_low[tri[2]])
-        spherical_utils.sphere_line(ax, gen_low[tri[2]], gen_low[tri[0]])
+        spherical_utils.sphere_line(ax, gen_upp[tri[0]], gen_upp[tri[1]], 'r')
+        spherical_utils.sphere_line(ax, gen_upp[tri[1]], gen_upp[tri[2]], 'r')
+        spherical_utils.sphere_line(ax, gen_upp[tri[2]], gen_upp[tri[0]], 'r')
     
     spherical_utils.disp_sphere(ax)
 
-
+def plot_2d_delaunay(points, tri):
+    plt.figure(2)
+    points = np.asarray(points)
+    plt.triplot(points[:,0], points[:,1], tri)
+    plt.show()
+    
+def remove_ill_tri(tri, pts, tcen, trad):
+    i = len(tri)
+    while i > 0:
+        i += -1
+        if not is_global(pts[tri[i,0]],pts[tri[i,1]],pts[tri[i,2]], tcen, trad):
+            tri = np.delete(tri, i, axis=0)
+    return tri
+    
+def is_global(p1, p2, p3, rcen, rrad):
+    trad, tcen = spherical_utils.cir_rad_center(p1, p2, p3)
+    tcen = spherical_utils.project_to_unit_sphere(tcen)
+    return (np.arccos(np.linalg.norm(rcen - tcen)) + trad) < rrad
+    
 #Performs delaunay with only one tangent plane
 def plot_delaunay_ill(ax, generators):
     pts = []    
