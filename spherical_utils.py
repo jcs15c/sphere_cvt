@@ -112,13 +112,33 @@ def project_onto_upper_plane(x):
     
     return s * x + (s - 1) * t 
     
+def cir_rad_center(p1, p2, p3):
+    p1_p2 = np.linalg.norm(p1 - p2)
+    p2_p3 = np.linalg.norm(p2 - p3)
+    p3_p1 = np.linalg.norm(p3 - p1)
+    p1_p3 = np.linalg.norm(p1 - p3)
+    
+    rad_den = 2 * np.linalg.norm(np.cross(p1 - p2, p2 - p3))
+    
+    radius = p1_p2 * p2_p3 * p3_p1 / rad_den
+    
+    cen_den = 2 * np.linalg.norm(np.cross(p1 - p2, p2 - p3)) ** 2
+    
+    al = p2_p3 ** 2 * np.dot(p1 - p2, p1 - p3) / cen_den
+    be = p1_p3 ** 2 * np.dot(p2 - p1, p2 - p3) / cen_den
+    ga = p1_p2 ** 2 * np.dot(p3 - p1, p3 - p2) / cen_den
+    
+    center = al * p1 + be * p2 + ga * p3    
+    
+    return radius, center
+
 def init_sphere():
      phi, theta = np.mgrid[0.0:pi:10j, 0.0:2.0*pi:25j]
      xx = np.sin(phi)*np.cos(theta)
      yy = np.sin(phi)*np.sin(theta)
      zz = np.cos(phi)
      
-     fig = plt.figure()
+     fig = plt.figure(1)
      ax = fig.add_subplot(111, projection='3d')
      ax.plot_surface(
           xx, yy, zz,  rstride=1, cstride=1, color='c', alpha=0.3, linewidth=0)
@@ -131,7 +151,7 @@ def disp_sphere(ax):
      ax.set_ylim([-1,1])
      ax.set_zlim([-1,1])
      ax.set_aspect("equal")
-     plt.tight_layout()
+     #plt.tight_layout()
      plt.show()
          
 
@@ -142,7 +162,7 @@ def sphere_points(ax, x):
      for xi in x:
           ax.scatter(xi[0],xi[1],xi[2],color="k",s=20)
    
-def sphere_line(ax, u, v):
+def sphere_line(ax, u, v, c = 'k'):
     #Makes parameterized line between points  
     r = 10
     
@@ -161,4 +181,4 @@ def sphere_line(ax, u, v):
         y[i] = new_pt1[1]
         z[i] = new_pt1[2]
     
-    ax.plot(x, y, z, color='k')
+    ax.plot(x, y, z, color=c)
