@@ -103,15 +103,25 @@ def project_onto_lower_plane(x):
     
     s = 2 / np.dot(t, x + t)
     
-    return s * x + (s - 1) * t
+    return (s * x + (s - 1) * t)[:2]
+
+def project_onto_lower_sphere(e):
+    n = np.array([0,0,-1])
+    e = np.array([e[0],e[1],-1])
+    return 1 / (4 + np.dot(e, e)) * (4*e - (4 - np.dot(e, e))*n)
     
 def project_onto_upper_plane(x):
     t = np.array([0,0,1])
     
     s = 2 / np.dot(t, x + t)
     
-    return s * x + (s - 1) * t 
+    return (s * x + (s - 1) * t )[:2]
     
+def project_onto_upper_sphere(e):
+    n = np.array([0,0,-1])
+    e = np.array([e[0],e[1],1])
+    return 1 / (4 + np.dot(e, e)) * (4*e - (4 - np.dot(e, e))*n)
+   
 def cir_rad_center(p1, p2, p3):
     p1_p2 = np.linalg.norm(p1 - p2)
     p2_p3 = np.linalg.norm(p2 - p3)
@@ -151,7 +161,7 @@ def disp_sphere(ax):
      ax.set_ylim([-1,1])
      ax.set_zlim([-1,1])
      ax.set_aspect("equal")
-     #plt.tight_layout()
+     plt.tight_layout()
      plt.show()
          
 
