@@ -1,10 +1,9 @@
 import spherical_utils
 import spherical_cvt
 
-N = 100
+N = 25
 M = 1000
 generators = spherical_utils.uniform_sample(N)
-print(generators[0])
 """
 ax = spherical_utils.init_sphere()
 
@@ -24,5 +23,11 @@ print(energy)
 ax = spherical_utils.init_sphere()
 
 #spherical_utils.sphere_points(ax, generators)
-spherical_cvt.plot_voronoi(ax, generators)
+spherical_cvt.plot_voronoi_tan(ax, generators, [0,0,-1])
+#spherical_cvt.plot_voronoi_tan(ax, generators, [0,0,-1])
+
+
+
+
+
 spherical_utils.disp_sphere(ax)

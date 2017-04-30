@@ -85,7 +85,7 @@ def plot_voronoi(ax, generators):
     pts_upp = []
     
     for i in range(len(generators)):
-        if np.arccos(np.dot([0,0,1],generators[i])) <= 3 * np.pi / 4:
+        if np.arccos(np.dot([0,0,1],generators[i])) <= 4 * np.pi / 5:
             pts_upp.append(spherical_utils.project_onto_upper_plane(generators[i]))
        # if np.arccos(np.dot([0,0,-1],generators[i])) <= 3 * np.pi / 4:
     
@@ -106,6 +106,55 @@ def plot_voronoi(ax, generators):
         p2 = v_upp_sphere[ind[1]]
         spherical_utils.sphere_line(ax,p1,p2)
         
+    pts_low = []
+    
+    for i in range(len(generators)):
+        if np.arccos(np.dot([0,0,-1],generators[i])) <= 4 * np.pi / 5:
+            pts_low.append(spherical_utils.project_onto_lower_plane(generators[i]))
+       # if np.arccos(np.dot([0,0,-1],generators[i])) <= 3 * np.pi / 4:
+    
+    vor_low = Voronoi(pts_low)
+    plot_internal_voronoi(vor_low)
+    
+    rv_low = vor_low.ridge_vertices
+    rv_low = int_ridge(rv_low)
+
+    v_low_plane = vor_low.vertices
+    v_low_sphere = np.zeros([v_low_plane.shape[0],3])
+        
+    for i in range(v_low_plane.shape[0]):
+        v_low_sphere[i] = spherical_utils.project_onto_lower_sphere(v_low_plane[i])
+       
+    for ind in rv_low:
+        p1 = v_low_sphere[ind[0]]
+        p2 = v_low_sphere[ind[1]]
+        spherical_utils.sphere_line(ax,p1,p2)
+
+def plot_voronoi_tan(ax, generators, tangent):
+    pts = []
+    gen = []
+    for i in range(len(generators)):
+        if np.arccos(np.dot(tangent,generators[i])) <=  np.pi / 2:
+            pts.append(spherical_utils.project_onto_tan_plane(generators[i], tangent))
+            gen.append(generators[i])
+   
+    vor = Voronoi(pts)
+    plot_internal_voronoi(vor)
+    
+    ridge_vertices = vor.ridge_vertices
+    ridge_vertices = int_ridge(ridge_vertices)
+
+    vertices_plane = vor.vertices
+    vertices_sphere = np.zeros([vertices_plane.shape[0],3])
+        
+    for i in range(vertices_plane.shape[0]):
+        vertices_sphere[i] = spherical_utils.project_onto_tan_sphere(vertices_plane[i], tangent)
+       
+    for ind in ridge_vertices:
+        p1 = vertices_sphere[ind[0]]
+        p2 = vertices_sphere[ind[1]]
+        spherical_utils.sphere_line(ax,p1,p2)
+      
 def plot_internal_voronoi(vor):
     plt.figure()
     ridge_vertices = vor.ridge_vertices

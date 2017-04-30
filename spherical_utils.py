@@ -106,7 +106,7 @@ def project_onto_lower_plane(x):
     return (s * x + (s - 1) * t)[:2]
 
 def project_onto_lower_sphere(e):
-    n = np.array([0,0,-1])
+    n = np.array([0,0,1])
     e = np.array([e[0],e[1],-1])
     return 1 / (4 + np.dot(e, e)) * (4*e - (4 - np.dot(e, e))*n)
     
@@ -121,6 +121,18 @@ def project_onto_upper_sphere(e):
     n = np.array([0,0,-1])
     e = np.array([e[0],e[1],1])
     return 1 / (4 + np.dot(e, e)) * (4*e - (4 - np.dot(e, e))*n)
+
+def project_onto_tan_sphere(e, t):
+    t = np.asarray(t)    
+    e = np.array([e[0],e[1],1])
+    return 1 / (4 + np.dot(e, e)) * (4*e - (4 - np.dot(e, e))*t)
+    
+def project_onto_tan_plane(x, t):
+    t = np.asarray(t)
+    s = 2 / np.dot(t, x + t)
+        
+    return (s * x + (s - 1) * t )[:2]
+
    
 def cir_rad_center(p1, p2, p3):
     p1_p2 = np.linalg.norm(p1 - p2)
