@@ -61,17 +61,7 @@ def plot_voronoi(ax, generators):
     ridges = calc_ridges(pts_all)
     
     for ridge in ridges:
-        spherical_utils.sphere_line(ax, cen_all[ridge[0]], cen_all[ridge[1]], 'r')
-    
-    return
-    
-    for tri in pts_all:
-        spherical_utils.sphere_line(ax, tri[0], tri[1], 'k')
-        spherical_utils.sphere_line(ax, tri[1], tri[2], 'k')
-        spherical_utils.sphere_line(ax, tri[2], tri[0], 'k')
-    
-    spherical_utils.sphere_points(ax, cen_all)
-    spherical_utils.disp_sphere(ax)
+        spherical_utils.sphere_line(ax, cen_all[ridge[0]], cen_all[ridge[1]], 'k')
     
 def calc_ridges(pts):
     ridges = []
@@ -116,7 +106,6 @@ def plot_delaunay(ax, generators):
         spherical_utils.sphere_line(ax, tri[1], tri[2], 'k')
         spherical_utils.sphere_line(ax, tri[2], tri[0], 'k')
     
-    spherical_utils.sphere_points(ax, cen_all)
     spherical_utils.disp_sphere(ax)
     
 def compute_delaunay(generators, full = 0):
@@ -179,6 +168,21 @@ def recombine_del(gen_upp, gen_low, tri_upp, tri_low):
     
     return unique_tri, unique_cen
 
+def plot_mercator_voronoi(generators):
+    plt.figure()    
+
+    tri_upp, tri_low, gen_upp, gen_low \
+            = compute_delaunay(generators, True)
+        
+    pts_all, cen_all = recombine_del(gen_upp, gen_low, tri_upp, tri_low)
+    ridges = calc_ridges(pts_all)
+    
+    for ridge in ridges:
+        spherical_utils.mercator_line(cen_all[ridge[0]], cen_all[ridge[1]])
+
+    plt.plot([-180, 180, 180, -180, -180], [90, 90, -90, -90, 90])
+    plt.show()
+
 def plot_2d_delaunay(points, tri):
     plt.figure()
     points = np.asarray(points)
@@ -199,6 +203,7 @@ def is_global(p1, p2, p3, rcen, rrad):
     trad, tcen = spherical_utils.cir_rad_center(p1, p2, p3)
     #tcen = spherical_utils.project_to_unit_sphere(tcen)
     return ( (np.linalg.norm(rcen - tcen)) < rrad)
+    
     
 ##############################################
     #####################################
