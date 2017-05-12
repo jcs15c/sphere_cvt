@@ -180,8 +180,11 @@ def plot_mercator_voronoi(generators):
     for ridge in ridges:
         spherical_utils.mercator_line(cen_all[ridge[0]], cen_all[ridge[1]])
 
+    for generator in generators:
+        spherical_utils.mercator_point(generator)
+        
     plt.axis('equal') 
-    plt.plot([-180, 180, 180, -180, -180], [90, 90, -90, -90, 90])
+    #plt.plot([-180, 180, 180, -180, -180], [90, 90, -90, -90, 90])
     plt.show()
 
 def plot_2d_delaunay(points, tri):

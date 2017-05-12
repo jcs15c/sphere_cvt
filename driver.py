@@ -1,7 +1,7 @@
 import spherical_utils
 import spherical_cvt
 
-N = 24
+N = 100
 M = 1000
 generators = spherical_utils.uniform_sample(N)
 

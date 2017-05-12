@@ -192,6 +192,15 @@ def sphere_line(ax, u, v, c = 'k'):
         z[i] = new_pt1[2]
     
     ax.plot(x, y, z, color=c)
+    
+def mercator_point(pt):
+    lat, long = get_lat_long(pt)
+    x = radians(long)
+    y = np.log(np.tan(np.pi/4 + radians(lat)/2))
+    #y = np.sin(radians(lat))
+    
+    plt.plot(x, y, 'bo')
+    
 
 def mercator_line(u, v):
     #u & v are cartesian points
@@ -225,16 +234,16 @@ def mercator_line(u, v):
     cart_x = []
     cart_y = []
     for i in range(r):
-        cart_x.append(long[i])
-        #cart_y.append(degrees(np.sin(radians(lats[i]))))
-        cart_y.append(degrees(np.log(np.tan(np.pi/4 + radians(lats[i])/2))))
+        cart_x.append(radians(long[i]))
+        #cart_y.append(np.sin(radians(lats[i])))
+        cart_y.append(np.log(np.tan(np.pi/4 + radians(lats[i])/2)))
  
-    if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < 180:
+    d = np.pi
+    if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < d:
         plt.plot(cart_x, cart_y, 'k-')
     else:
         for i in range(r-1):
-            if np.linalg.norm(np.asarray([cart_x[i], cart_y[i]]) - np.asarray([cart_x[i+1], cart_y[i+1]])) < 180:
-                #print(cart_x[i:i+1], cart_y[i:i+1])
+            if np.linalg.norm(np.asarray([cart_x[i], cart_y[i]]) - np.asarray([cart_x[i+1], cart_y[i+1]])) < d:
                 plt.plot(cart_x[i:i+2], cart_y[i:i+2], 'k-')
         
         
