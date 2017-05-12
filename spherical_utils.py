@@ -148,7 +148,7 @@ def init_sphere():
      yy = np.sin(phi)*np.sin(theta)
      zz = np.cos(phi)
      
-     fig = plt.figure(1)
+     fig = plt.figure()
      ax = fig.add_subplot(111, projection='3d')
      ax.plot_surface(
           xx, yy, zz,  rstride=1, cstride=1, color='c', alpha=0.3, linewidth=0)
@@ -192,6 +192,44 @@ def sphere_line(ax, u, v, c = 'k'):
         z[i] = new_pt1[2]
     
     ax.plot(x, y, z, color=c)
+
+def mercator_line(u, v):
+    #u & v are cartesian points
+    r = 10
+    
+    t = np.linspace(0, 1, r)      
+    w = v - u        
+    x = u[0] + t*w[0]
+    y = u[1] + t*w[1]
+    z = u[2] + t*w[2]
+
+    #Projects points on line onto unit sphere
+    for i in range(r):
+        pt = np.array([x[i],y[i],z[i]])
+        new_pt = project_to_unit_sphere(pt)
+    
+        x[i] = new_pt[0]
+        y[i] = new_pt[1]
+        z[i] = new_pt[2]
+
+    #Converts points to lat/long
+    lats = []
+    long = []
+
+    for i in range(r):
+        lat_long = get_lat_long([x[i],y[i],z[i]])
+        lats.append(lat_long[0])
+        long.append(lat_long[1])
+
+    #Converts to xy
+    cart_x = []
+    cart_y = []
+    for i in range(r):
+        cart_x.append(long[i])
+        cart_y.append(degrees(np.log(np.tan(np.pi/4 + radians(lats[i])/2))))
+ 
+    #if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < 300:
+    plt.plot(cart_x, cart_y, 'k-')
     
 def project_onto_tan_sphere(e, t):
     t = np.asarray(t)    
