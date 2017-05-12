@@ -226,11 +226,18 @@ def mercator_line(u, v):
     cart_y = []
     for i in range(r):
         cart_x.append(long[i])
+        #cart_y.append(degrees(np.sin(radians(lats[i]))))
         cart_y.append(degrees(np.log(np.tan(np.pi/4 + radians(lats[i])/2))))
  
-    #if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < 300:
-    plt.plot(cart_x, cart_y, 'k-')
-    
+    if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < 180:
+        plt.plot(cart_x, cart_y, 'k-')
+    else:
+        for i in range(r-1):
+            if np.linalg.norm(np.asarray([cart_x[i], cart_y[i]]) - np.asarray([cart_x[i+1], cart_y[i+1]])) < 180:
+                #print(cart_x[i:i+1], cart_y[i:i+1])
+                plt.plot(cart_x[i:i+2], cart_y[i:i+2], 'k-')
+        
+        
 def project_onto_tan_sphere(e, t):
     t = np.asarray(t)    
     e = np.array([e[0],e[1],1])

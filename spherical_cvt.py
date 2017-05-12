@@ -180,6 +180,7 @@ def plot_mercator_voronoi(generators):
     for ridge in ridges:
         spherical_utils.mercator_line(cen_all[ridge[0]], cen_all[ridge[1]])
 
+    plt.axis('equal') 
     plt.plot([-180, 180, 180, -180, -180], [90, 90, -90, -90, 90])
     plt.show()
 
