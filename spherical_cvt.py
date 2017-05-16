@@ -3,8 +3,9 @@ import math
 import numpy as np
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
-from scipy.spatial import Voronoi, voronoi_plot_2d
+import projections
 
+pop_density = np.genfromtxt('population_full.csv', delimiter=',')
 
 def cvt_step(generators, M):
      
@@ -21,9 +22,15 @@ def compute_center_of_mass(b):
      z1 = 0;
      
      for x in b:
-          x1 += x[0]/len(b)
-          y1 += x[1]/len(b)
-          z1 += x[2]/len(b)
+          lat, lon = spherical_utils.get_lat_long(x)
+          lat *= -1
+          lon *= 1
+          den = pop_density[int(lat + 60),int(lon + 180)]
+          if den < 0:
+              den = 0
+          x1 += x[0]/len(b) * den  
+          y1 += x[1]/len(b) * den
+          z1 += x[2]/len(b) * den
           
      return np.array([x1,y1,z1])
           
@@ -168,9 +175,7 @@ def recombine_del(gen_upp, gen_low, tri_upp, tri_low):
     
     return unique_tri, unique_cen
 
-def plot_mercator_voronoi(generators):
-    plt.figure()    
-
+def plot_voronoi_map(generators, project, points = False):
     tri_upp, tri_low, gen_upp, gen_low \
             = compute_delaunay(generators, True)
         
@@ -178,13 +183,15 @@ def plot_mercator_voronoi(generators):
     ridges = calc_ridges(pts_all)
     
     for ridge in ridges:
-        spherical_utils.mercator_line(cen_all[ridge[0]], cen_all[ridge[1]])
+        spherical_utils.projection_line(cen_all[ridge[0]], cen_all[ridge[1]], project)
 
-    for generator in generators:
-        spherical_utils.mercator_point(generator)
-        
+    if points:
+        for generator in generators:
+            spherical_utils.projection_point(generator, project)
+    
     plt.axis('equal') 
-    #plt.plot([-180, 180, 180, -180, -180], [90, 90, -90, -90, 90])
+    projections.plot_outline(project)
+        
     plt.show()
 
 def plot_2d_delaunay(points, tri):

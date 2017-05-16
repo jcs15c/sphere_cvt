@@ -16,15 +16,24 @@ def uniform_sample(N):
                of the points
     
     """
+    
+    
      x = list();
-     for i in range(N):
+     while len(x) < N:
           x1 = random.gauss(0,1)
           x2 = random.gauss(0,1)
           x3 = random.gauss(0,1)
           
           r = sqrt(x1**2 + x2**2 + x3**2)
           
-          x.append(np.array([x1/r, x2/r, x3/r]))
+          nx = np.array([x1/r, x2/r, x3/r])
+          
+          lat, lon = get_lat_long(nx)
+          
+          if lat > 85 or lat < -60:
+              continue
+          
+          x.append(nx)
           
      return x
 
@@ -193,16 +202,12 @@ def sphere_line(ax, u, v, c = 'k'):
     
     ax.plot(x, y, z, color=c)
     
-def mercator_point(pt):
+def projection_point(pt, project):
     lat, long = get_lat_long(pt)
-    x = radians(long)
-    y = np.log(np.tan(np.pi/4 + radians(lat)/2))
-    #y = np.sin(radians(lat))
-    
+    x, y = project(lat, long)
     plt.plot(x, y, 'bo')
-    
 
-def mercator_line(u, v):
+def projection_line(u, v, project):
     #u & v are cartesian points
     r = 10
     
@@ -234,19 +239,18 @@ def mercator_line(u, v):
     cart_x = []
     cart_y = []
     for i in range(r):
-        cart_x.append(radians(long[i]))
-        #cart_y.append(np.sin(radians(lats[i])))
-        cart_y.append(np.log(np.tan(np.pi/4 + radians(lats[i])/2)))
+        tx, ty = project(lats[i], long[i])
+        cart_x.append(tx)
+        cart_y.append(ty)
  
-    d = np.pi
+    d = np.pi/3
     if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < d:
         plt.plot(cart_x, cart_y, 'k-')
     else:
         for i in range(r-1):
             if np.linalg.norm(np.asarray([cart_x[i], cart_y[i]]) - np.asarray([cart_x[i+1], cart_y[i+1]])) < d:
                 plt.plot(cart_x[i:i+2], cart_y[i:i+2], 'k-')
-        
-        
+            
 def project_onto_tan_sphere(e, t):
     t = np.asarray(t)    
     e = np.array([e[0],e[1],1])
