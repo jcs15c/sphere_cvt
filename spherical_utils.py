@@ -4,18 +4,20 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from math import *
 
+pop_density = np.genfromtxt('population_full.csv', delimiter=',')
+
 def uniform_sample(N):
      """ Returns N uniformly random points on the surface of a sphere of
      radius 1 centered at the origin.
   
-    Args
+     Args
         N -- number of random points
         
-    Returns 
+     Returns 
           x -- a list of numpy arrays containing the cartesian coordinates 
                of the points
     
-    """
+     """
     
     
      x = list();
@@ -27,11 +29,6 @@ def uniform_sample(N):
           r = sqrt(x1**2 + x2**2 + x3**2)
           
           nx = np.array([x1/r, x2/r, x3/r])
-          
-          lat, lon = get_lat_long(nx)
-          
-          if lat > 85 or lat < -60:
-              continue
           
           x.append(nx)
           
@@ -55,13 +52,22 @@ def get_lat_long(x):
      
      r = sqrt(x[0]**2 + x[1]**2 + x[2]**2)
      longitude = degrees(atan2(x[1],x[0]))
-     latitude = degrees(acos(x[2]/r))
+     latitude = degrees(asin(x[2]/r))
      
      #wrap latitude to [-90,90)
-     latitude = latitude - 90
+     #latitude = latitude - 90
      
      return latitude, longitude
 
+def get_cartesian(lat, lon):
+    lat=radians(lat)
+    lon=radians(lon)
+    x = np.cos(lat) * np.cos(lon)
+    y = np.cos(lat) * np.sin(lon)
+    z = np.sin(lat)
+    
+    return np.array([x, y, z])
+    
 ########################################################################
 ########################################################################
 def distance_euclidean(x, y):
@@ -124,6 +130,13 @@ def project_onto_upper_plane(x):
     
     s = 2 / np.dot(t, x + t)
     
+    p = (s * x + (s - 1) * t )[:2]
+
+    if np.isnan(p).any():
+        print("ERROR ERROR YOU DING DONG")
+        print(x)
+        exit()
+    
     return (s * x + (s - 1) * t )[:2]
     
 def project_onto_upper_sphere(e):
@@ -183,7 +196,7 @@ def sphere_points(ax, x):
    
 def sphere_line(ax, u, v, c = 'k'):
     #Makes parameterized line between points  
-    r = 10
+    r = 20
     
     t = np.linspace(0, 1, r)      
     w = v - u        
@@ -202,55 +215,37 @@ def sphere_line(ax, u, v, c = 'k'):
     
     ax.plot(x, y, z, color=c)
     
-def projection_point(pt, project):
-    lat, long = get_lat_long(pt)
-    x, y = project(lat, long)
-    plt.plot(x, y, 'bo')
-
-def projection_line(u, v, project):
-    #u & v are cartesian points
-    r = 10
+def sphere_line2(ax, u, v, c = 'k'):
+    #Makes parameterized line between points  
+    r = 20
     
     t = np.linspace(0, 1, r)      
-    w = v - u        
+    w = np.cross(np.cross(u,v),u)     
     x = u[0] + t*w[0]
     y = u[1] + t*w[1]
     z = u[2] + t*w[2]
 
     #Projects points on line onto unit sphere
     for i in range(r):
-        pt = np.array([x[i],y[i],z[i]])
-        new_pt = project_to_unit_sphere(pt)
+        pt1 = np.array([x[i],y[i],z[i]])
+        new_pt1 = project_to_unit_sphere(pt1)
     
-        x[i] = new_pt[0]
-        y[i] = new_pt[1]
-        z[i] = new_pt[2]
+        x[i] = new_pt1[0]
+        y[i] = new_pt1[1]
+        z[i] = new_pt1[2]
+    
+    ax.plot(x, y, z, color=c)
 
-    #Converts points to lat/long
-    lats = []
-    long = []
 
-    for i in range(r):
-        lat_long = get_lat_long([x[i],y[i],z[i]])
-        lats.append(lat_long[0])
-        long.append(lat_long[1])
-
-    #Converts to xy
-    cart_x = []
-    cart_y = []
-    for i in range(r):
-        tx, ty = project(lats[i], long[i])
-        cart_x.append(tx)
-        cart_y.append(ty)
- 
-    d = np.pi/3
-    if np.linalg.norm(np.asarray([cart_x[0], cart_y[0]]) - np.asarray([cart_x[-1], cart_y[-1]])) < d:
-        plt.plot(cart_x, cart_y, 'k-')
-    else:
-        for i in range(r-1):
-            if np.linalg.norm(np.asarray([cart_x[i], cart_y[i]]) - np.asarray([cart_x[i+1], cart_y[i+1]])) < d:
-                plt.plot(cart_x[i:i+2], cart_y[i:i+2], 'k-')
-            
+def get_lat_long_array():
+    llarray = []
+    for lon in range(-180, 181):
+        for lat in range(-90, 91):
+            if pop_density[int(-(lat - 90)),int(lon + 180)] > 0:
+                llarray.append(get_cartesian(lat, lon))
+        
+    return llarray
+    
 def project_onto_tan_sphere(e, t):
     t = np.asarray(t)    
     e = np.array([e[0],e[1],1])
