@@ -5,8 +5,17 @@ from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import projections
 
-pop_density = np.genfromtxt('population_full.csv', delimiter=',')
+pop_density = np.genfromtxt('population_count_full.csv', delimiter=',')
+llarray = spherical_utils.get_lat_long_array()
 
+def llarray_sample(N):
+    generators = []
+    
+    for i in range(N):
+        generators.append(llarray[np.random.randint(1, len(llarray)) - 1])
+        
+    return generators
+    
 def cvt_step(generators, M):
      
      bins, energy = bin_points(generators, M)
@@ -16,28 +25,31 @@ def cvt_step(generators, M):
                                                   compute_center_of_mass(bins[i]))
      
 def compute_center_of_mass(b):
+     #if len(b) == 0:
+     #    return llarray[np.random.randint(1, len(llarray)) - 1]
      
-     x1 = 0;
-     y1 = 0;
-     z1 = 0;
+     x1 = 0
+     y1 = 0
+     z1 = 0
+     m  = 0
      
      for x in b:
           lat, lon = spherical_utils.get_lat_long(x)
-          lat *= -1
-          lon *= 1
-          den = pop_density[int(lat + 60),int(lon + 180)]
+          den = pop_density[int(-(lat - 90)),int(lon + 180)]
           if den < 0:
-              den = 0
-          x1 += x[0]/len(b) * den  
-          y1 += x[1]/len(b) * den
-          z1 += x[2]/len(b) * den
+              continue
+              
+          x1 += x[0] * den  
+          y1 += x[1] * den
+          z1 += x[2] * den
+          m  += den
           
-     return np.array([x1,y1,z1])
+     return np.array([x1,y1,z1])/m
           
 def bin_points(generators, M):
      
      # create M uniform test points
-     x = spherical_utils.uniform_sample(M)
+     x = llarray
      
      bins = [ [] for x in range(len(generators))]
      energy = 0
@@ -48,8 +60,9 @@ def bin_points(generators, M):
           bi = -1
           
           for i in range(0,len(generators)):
-               
-               di = spherical_utils.distance_euclidean(xi,generators[i])
+               #lat, lon = spherical_utils.get_lat_long(xi)
+               #den = pop_density[int(-(lat - 90)), int(lon + 180)] + 1e-10
+               di = spherical_utils.distance_euclidean(xi,generators[i])# / den
                if (di < d):
                     d = di
                     bi = i
@@ -183,17 +196,15 @@ def plot_voronoi_map(generators, project, points = False):
     ridges = calc_ridges(pts_all)
     
     for ridge in ridges:
-        spherical_utils.projection_line(cen_all[ridge[0]], cen_all[ridge[1]], project)
+        projections.projection_line(cen_all[ridge[0]], cen_all[ridge[1]], project)
 
     if points:
         for generator in generators:
-            spherical_utils.projection_point(generator, project)
+            projections.projection_point(generator, project)
     
     plt.axis('equal') 
     projections.plot_outline(project)
         
-    plt.show()
-
 def plot_2d_delaunay(points, tri):
     plt.figure()
     points = np.asarray(points)
