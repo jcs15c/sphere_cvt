@@ -3,7 +3,7 @@ import spherical_cvt
 from projections import *
 
 N = 100
-M = 100000
+M = 10000
 
 """
 gens = []
@@ -23,29 +23,14 @@ for j in range(20):
     for i in range(5):
         generators.append(gens[i])
 """
-generators = spherical_cvt.llarray_sample(100)
+generators = spherical_cvt.llarray_sample(N)
+sample = spherical_cvt.prop_sample(M)
 
 coast = read_coast_data()
 plot_coast_map(coast, winkel)
 spherical_cvt.plot_voronoi_map(generators, winkel, True)
 plt.axis([-3, 3, -2, 2])
-plt.savefig('asia_init.png', dpi=500)
-
-"""
-plt.cla()
-coast = read_coast_data()
-plot_coast_map(coast, mercator)
-spherical_cvt.plot_voronoi_map(generators, mercator, True)
-plt.savefig('mercator_0.png', dpi=500)
-
-plt.cla()
-coast = read_coast_data()
-plot_coast_map(coast, albers)
-spherical_cvt.plot_voronoi_map(generators, albers, True)
-plt.savefig('albers_0.png', dpi=500)
-"""
-bins, energy = spherical_cvt.bin_points(generators, M)
-print(energy)
+plt.savefig('test_0.png', dpi=500)
 
 for k in range(30):
     if k:    
@@ -54,43 +39,15 @@ for k in range(30):
         plot_coast_map(coast, winkel)
         spherical_cvt.plot_voronoi_map(generators, winkel, True)
         plt.axis([-3, 3, -2, 2])
-        plt.savefig('asia_' + str(k) + '.png', dpi=500)
-        """
-        plt.cla()
-        coast = read_coast_data()
-        plot_coast_map(coast, mercator)
-        spherical_cvt.plot_voronoi_map(generators, mercator, True)
-        plt.savefig('mercator_5.png', dpi=500)
-        
-        plt.cla()
-        coast = read_coast_data()
-        plot_coast_map(coast, albers)
-        spherical_cvt.plot_voronoi_map(generators, albers, True)
-        plt.savefig('albers_5.png', dpi=500)  
-        """
-    spherical_cvt.cvt_step(generators, M)
-    bins, energy = spherical_cvt.bin_points(generators, M)
-    print(k, energy)
-
-print(energy)
+        plt.savefig('test_' + str(k) + '.png', dpi=500)
+    
+    sample = spherical_cvt.prop_sample(M)    
+    spherical_cvt.cvt_step(generators, M, sample)
 
 plt.cla()
 coast = read_coast_data()
 plot_coast_map(coast, winkel)
 spherical_cvt.plot_voronoi_map(generators, winkel, True)
 plt.axis([-3, 3, -2, 2])
-plt.savefig('asia_final.png', dpi=500)
+plt.savefig('test_final.png', dpi=500)
 
-"""
-plt.cla()
-coast = read_coast_data()
-plot_coast_map(coast, mercator)
-spherical_cvt.plot_voronoi_map(generators, mercator, True)
-plt.savefig('mercator_30.png', dpi=500)
-
-plt.cla()
-coast = read_coast_data()
-plot_coast_map(coast, albers)
-spherical_cvt.plot_voronoi_map(generators, albers, True)
-plt.savefig('albers_30.png', dpi=500)  
-"""

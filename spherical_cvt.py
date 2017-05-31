@@ -5,7 +5,7 @@ from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import projections
 
-pop_density = np.genfromtxt('population_count_full.csv', delimiter=',')
+pop_density = np.genfromtxt('population_full.csv', delimiter=',')
 llarray = spherical_utils.get_lat_long_array()
 
 def llarray_sample(N):
@@ -16,14 +16,33 @@ def llarray_sample(N):
         
     return generators
     
-def cvt_step(generators, M):
+def cvt_step(generators, M, samples = np.nan):
      
-     bins, energy = bin_points(generators, M)
+     bins, energy = bin_points(generators, M, samples)
+     print(energy)
      
      for i in range(0, len(generators)):
           generators[i] = spherical_utils.project_to_unit_sphere(
                                                   compute_center_of_mass(bins[i]))
-     
+    
+def prop_sample(N):
+    llarray = spherical_utils.get_lat_long_array()
+    prop_samp = []
+    max_den = np.max(pop_density)
+    
+    while len(prop_samp) < N:
+        #Take random 0-1 real
+        test_val = np.random.rand()
+        #Take random non-zero sample point
+        pt = llarray[np.random.randint(1, len(llarray)) - 1]
+        #Convert to lat-long and get density at that point, divide by max
+        lat, lon = spherical_utils.get_lat_long(pt)
+        den = pop_density[int(-(lat - 90)),int(lon + 180)]/max_den
+        if den > test_val:
+            prop_samp.append(pt)
+    
+    return prop_samp
+    
 def compute_center_of_mass(b):
      #if len(b) == 0:
      #    return llarray[np.random.randint(1, len(llarray)) - 1]
@@ -46,10 +65,13 @@ def compute_center_of_mass(b):
           
      return np.array([x1,y1,z1])/m
           
-def bin_points(generators, M):
+def bin_points(generators, M, samples = np.nan):
      
      # create M uniform test points
-     x = llarray
+     if np.isnan(samples).all():
+         x = spherical_utils.uniform_sample(M)
+     else:
+         x = samples
      
      bins = [ [] for x in range(len(generators))]
      energy = 0
@@ -134,7 +156,7 @@ def compute_delaunay(generators, full = 0):
     gen_upp = []
     gen_low = []
     
-    radius = np.pi    
+    radius = np.pi - 0.1
     
     for i in range(len(generators)):
         if np.arccos(np.dot([0,0,1],generators[i])) <= radius:
