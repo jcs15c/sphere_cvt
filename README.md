@@ -48,4 +48,4 @@ THe Voronoi diagram can be computed from the circumcenters of each of the Delaun
  
 Because of the nature of the projection from a sphere to plane, some triangles are very narrow and are not true Delaunay triangles. These must be removed before the two haves are recombined, or else they will not overlap correctly. This is done by removing triangles whose circumcenters are outside of the radius of the circle of points assigned to each tangent plane. 
 
-![Spherical CVT Example](https://github.com/jcs15c/sphere_cvt/blob/master/Spherical_CVT_Example.png "Spherical_CVT_Example")
+![Ill-Triange Example](https://github.com/jcs15c/sphere_cvt/blob/master/Ill_Triangle_Example.png "Ill_Triangle_Example")
