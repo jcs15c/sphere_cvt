@@ -42,4 +42,4 @@ THe Voronoi diagram can be computed from the circumcenters of each of the Delaun
       spherical_cvt.plot_delaunay(fx, generators)
       spherical_utils.disp_sphere(fx) 
 ```
- #![]( "")
+ #![Spherical_CVT_Example](https://github.com/jcs15c/sphere_cvt/blob/master/Spherical_CVT_Example.png "Spherical_CVT_Example")
