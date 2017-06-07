@@ -6,12 +6,40 @@ This is a library to calculate and display Centroidal Voronoi Diagrams on the sp
 
 While the calculations for computing the CVT clusters and centroids on a 3D surface are similar to the 2D case on a plane, or a 3D case in space, presenting the results in a comprehendable format requires additional functionality.
 
+By utilizing a series of projections between the sphere and tangent planes at its poles, the vertices of the triangles of the Delaunay triangulation can be calculated and drawn on the sphere. Each point on the sphere is sorted and projected onto one of the two tangent planes, where the Triangulation is computed independently for the each half. The two halves are then recombined, and the corresponding delaunay ridges are drawn on the sphere.
 
-## Delaunay on the sphere
-
-By utilizing a series of projections between the sphere and tangent planes at its poles, the vertices of the triangles of the Delaunay triangulation can be calculated and drawn on the sphere. Each point on the sphere is sorted and projected onto one of the two tangent planes, where the Triangulation is computed independently for the each half. 
+THe Voronoi diagram can be computed from the circumcenters of each of the Delaunay triangles. Circumcenters for adjacent triangles are connected, and the resulting diagram is the Voronoi Diagram
 
 ```python
-  #![]( "")
-  
+      generators = spherical_utils.uniform_sample(25)
+      sample = spherical_utils.uniform_sample(1000)
+
+      ax = spherical_utils.init_sphere()
+      spherical_utils.sphere_points(ax, generators)
+      spherical_utils.disp_sphere(ax)
+
+      cx = spherical_utils.init_sphere()
+      spherical_cvt.plot_voronoi(cx, generators)
+      spherical_utils.disp_sphere(cx)
+
+      dx = spherical_utils.init_sphere()
+      spherical_cvt.plot_delaunay(dx, generators)
+      spherical_utils.disp_sphere(dx)
+
+      for i in range(5):
+        #Third parameter governs density function, 0 for uniform
+        spherical_cvt.cvt_step(generators, 1000, 0)
+
+      bx = spherical_utils.init_sphere()    
+      spherical_utils.sphere_points(bx, generators)
+      spherical_utils.disp_sphere(bx)
+
+      ex = spherical_utils.init_sphere()
+      spherical_cvt.plot_voronoi(ex, generators)
+      spherical_utils.disp_sphere(ex)
+
+      fx = spherical_utils.init_sphere()
+      spherical_cvt.plot_delaunay(fx, generators)
+      spherical_utils.disp_sphere(fx) 
 ```
+ #![]( "")
