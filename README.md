@@ -8,7 +8,7 @@ While the calculations for computing the CVT clusters and centroids on a 3D surf
 
 By utilizing a series of projections between the sphere and tangent planes at its poles, the vertices of the triangles of the Delaunay triangulation can be calculated and drawn on the sphere. Each point on the sphere is sorted and projected onto one of the two tangent planes, where the Triangulation is computed independently for the each half. The two halves are then recombined, and the corresponding delaunay ridges are drawn on the sphere.
 
-THe Voronoi diagram can be computed from the circumcenters of each of the Delaunay triangles. Circumcenters for adjacent triangles are connected, and the resulting diagram is the Voronoi Diagram
+THe Voronoi diagram can be computed from the circumcenters of each of the Delaunay triangles. Circumcenters for adjacent triangles are connected, and the resulting image is the Voronoi Diagram
 
 ```python
       generators = spherical_utils.uniform_sample(25)
@@ -42,4 +42,10 @@ THe Voronoi diagram can be computed from the circumcenters of each of the Delaun
       spherical_cvt.plot_delaunay(fx, generators)
       spherical_utils.disp_sphere(fx) 
 ```
- ![Spherical CVT Example](https://github.com/jcs15c/sphere_cvt/blob/master/Spherical_CVT_Example.png "Spherical_CVT_Example")
+![Spherical CVT Example](https://github.com/jcs15c/sphere_cvt/blob/master/Spherical_CVT_Example.png "Spherical_CVT_Example")
+ 
+## Removing Ill-Defined Voronoi Triangles
+ 
+Because of the nature of the projection from a sphere to plane, some triangles are very narrow and are not true Delaunay triangles. These must be removed before the two haves are recombined, or else they will not overlap correctly. This is done by removing triangles whose circumcenters are outside of the radius of the circle of points assigned to each tangent plane. 
+
+![Spherical CVT Example](https://github.com/jcs15c/sphere_cvt/blob/master/Spherical_CVT_Example.png "Spherical_CVT_Example")
