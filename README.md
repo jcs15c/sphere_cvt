@@ -62,3 +62,13 @@ Using existing MATLAB coast data, an outline of the world continents can be draw
       spherical_utils.disp_sphere(ax)
 ```
 ![Spherical Coast Outline](https://github.com/jcs15c/sphere_cvt/blob/master/World_Map_3D.png "World_Map_3D")
+
+## Map Projections
+
+Because Python's 3D graphing functions are transparent, it is difficult to see things plotted on the sphere. Thus, it is oftentimes useful to project the resulting images to a 2D plane. Some projections preserve equal distances while others preserve equal areas. The Winkel Tripel projection is referred to as a compromise projection, being a mix of both styles. 
+
+The following projections are:
+Mercator         Lambert Cylindrical
+Albers Conal     Winkel Tripel
+
+![Coast Map Projections](https://github.com/jcs15c/sphere_cvt/blob/master/Map_Projections.png "Coast_Map_Projections")
