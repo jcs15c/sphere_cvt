@@ -49,3 +49,16 @@ THe Voronoi diagram can be computed from the circumcenters of each of the Delaun
 Because of the nature of the projection from a sphere to plane, some triangles are very narrow and are not true Delaunay triangles. These must be removed before the two haves are recombined, or else they will not overlap correctly. This is done by removing triangles whose circumcenters are outside of the radius of the circle of points assigned to each tangent plane. 
 
 ![Ill-Triange Example](https://github.com/jcs15c/sphere_cvt/blob/master/Ill_Triangle_Example.png "Ill_Triangle_Example")
+
+## Coastal Map Data
+
+Using existing MATLAB coast data, an outline of the world continents can be drawn on the 3D Sphere.
+
+```python
+      coast = read_coast_data()
+
+      ax = spherical_utils.init_sphere()
+      plot_coast_map_3d(ax, coast)
+      spherical_utils.disp_sphere(ax)
+```
+![Spherical Coast Outline](https://github.com/jcs15c/sphere_cvt/blob/master/World_Map_3D.png "World_Map_3D")
