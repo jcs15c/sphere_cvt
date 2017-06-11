@@ -70,3 +70,5 @@ Because Python's 3D graphing functions are transparent, it is difficult to see t
 The following projections are from left to right, top to bottom: Mercator, Lambert Cylindrical, Albers Conal, Winkel Tripel
 
 ![Coast Map Projections](https://github.com/jcs15c/sphere_cvt/blob/master/Map_Projections.png "Coast_Map_Projections")
+
+
