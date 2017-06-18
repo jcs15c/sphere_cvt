@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import projections
 
 pop_density = np.genfromtxt('population_full.csv', delimiter=',')
+pop_density /= np.max(pop_density)
 llarray = spherical_utils.get_lat_long_array()
 
 def llarray_sample(N):
@@ -16,15 +17,15 @@ def llarray_sample(N):
         
     return generators
     
-def cvt_step(generators, M, samples = np.nan):
+def cvt_step(generators, M, lam, samples = np.nan):
      
      bins, energy = bin_points(generators, M, samples)
-     print(energy)
      
      for i in range(0, len(generators)):
           generators[i] = spherical_utils.project_to_unit_sphere(
-                                                  compute_center_of_mass(bins[i]))
-    
+                                                  compute_center_of_mass(bins[i], lam))
+     return energy
+     
 def prop_sample(N):
     llarray = spherical_utils.get_lat_long_array()
     prop_samp = []
@@ -43,9 +44,9 @@ def prop_sample(N):
     
     return prop_samp
     
-def compute_center_of_mass(b):
+def compute_center_of_mass(b, lam):
      #if len(b) == 0:
-     #    return llarray[np.random.randint(1, len(llarray)) - 1]
+     #    return prop_sample(1)[0]
      
      x1 = 0
      y1 = 0
@@ -56,7 +57,10 @@ def compute_center_of_mass(b):
           lat, lon = spherical_utils.get_lat_long(x)
           den = pop_density[int(-(lat - 90)),int(lon + 180)]
           if den < 0:
-              continue
+              den = 0
+              
+          den = 1 - lam + lam * den
+
               
           x1 += x[0] * den  
           y1 += x[1] * den
@@ -156,7 +160,7 @@ def compute_delaunay(generators, full = 0):
     gen_upp = []
     gen_low = []
     
-    radius = np.pi - 0.1
+    radius = np.pi - 0.1 
     
     for i in range(len(generators)):
         if np.arccos(np.dot([0,0,1],generators[i])) <= radius:
@@ -231,8 +235,10 @@ def plot_2d_delaunay(points, tri):
     plt.figure()
     points = np.asarray(points)
     plt.triplot(points[:,0], points[:,1], tri)
-    plt.ylim([-5,5])
-    plt.xlim([-5,5])
+    plt.axis('equal')
+
+    plt.ylim([-3,3])
+    plt.xlim([-3,3])
     plt.show()
     
 def remove_ill_tri(tri, pts, tcen, trad):

@@ -118,7 +118,9 @@ def project_onto_lower_plane(x):
     
     s = 2 / np.dot(t, x + t)
     
-    return (s * x + (s - 1) * t)[:2]
+    p = (s * x + (s - 1) * t)[:2]
+
+    return p
 
 def project_onto_lower_sphere(e):
     n = np.array([0,0,1])
@@ -131,13 +133,8 @@ def project_onto_upper_plane(x):
     s = 2 / np.dot(t, x + t)
     
     p = (s * x + (s - 1) * t )[:2]
-
-    if np.isnan(p).any():
-        print("ERROR ERROR YOU DING DONG")
-        print(x)
-        exit()
     
-    return (s * x + (s - 1) * t )[:2]
+    return p
     
 def project_onto_upper_sphere(e):
     n = np.array([0,0,-1])
@@ -241,8 +238,8 @@ def get_lat_long_array():
     llarray = []
     for lon in range(-180, 181):
         for lat in range(-90, 91):
-            if pop_density[int(-(lat - 90)),int(lon + 180)] > 0:
-                llarray.append(get_cartesian(lat, lon))
+            #if pop_density[int(-(lat - 90)),int(lon + 180)] > 0:
+            llarray.append(get_cartesian(lat, lon))
         
     return llarray
     
