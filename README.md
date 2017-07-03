@@ -42,13 +42,13 @@ THe Voronoi diagram can be computed from the circumcenters of each of the Delaun
       spherical_cvt.plot_delaunay(fx, generators)
       spherical_utils.disp_sphere(fx) 
 ```
-![Spherical CVT Example](https://github.com/jcs15c/sphere_cvt/blob/master/Spherical_CVT_Example.png "Spherical_CVT_Example")
+![Spherical CVT Example](https://github.com/jcs15c/sphere_cvt/blob/master/output/examples/Spherical_CVT_Example.png "Spherical_CVT_Example")
  
 ## Removing Ill-Defined Voronoi Triangles
  
 Because of the nature of the projection from a sphere to plane, some triangles are very narrow and are not true Delaunay triangles. These must be removed before the two haves are recombined, or else they will not overlap correctly. This is done by removing triangles whose circumcenters are outside of the radius of the circle of points assigned to each tangent plane. 
 
-![Ill-Triange Example](https://github.com/jcs15c/sphere_cvt/blob/master/Ill_Triangle_Example.png "Ill_Triangle_Example")
+![Ill-Triange Example](https://github.com/jcs15c/sphere_cvt/blob/master/output/examples/Ill_Triangle_Example.png "Ill_Triangle_Example")
 
 ## Coastal Map Data
 
@@ -61,7 +61,7 @@ Using existing MATLAB coast data, an outline of the world continents can be draw
       plot_coast_map_3d(ax, coast)
       spherical_utils.disp_sphere(ax)
 ```
-![Spherical Coast Outline](https://github.com/jcs15c/sphere_cvt/blob/master/World_Map_3D.png "World_Map_3D")
+![Spherical Coast Outline](https://github.com/jcs15c/sphere_cvt/blob/master/output/examples/World_Map_3D.png "World_Map_3D")
 
 ## Map Projections
 
@@ -69,6 +69,6 @@ Because Python's 3D graphing functions are transparent, it is difficult to see t
 
 The following projections are from left to right, top to bottom: Mercator, Lambert Cylindrical, Albers Conal, Winkel Tripel
 
-![Coast Map Projections](https://github.com/jcs15c/sphere_cvt/blob/master/Map_Projections.png "Coast_Map_Projections")
+![Coast Map Projections](https://github.com/jcs15c/sphere_cvt/blob/master/output/examples/Map_Projections.png "Coast_Map_Projections")
 
 
