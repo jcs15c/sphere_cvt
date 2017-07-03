@@ -1,0 +1,1 @@
+Land sample for generators, full llarray for sample points, uniform density
