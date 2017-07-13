@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import spherical_utils
+import sample_density
 
 def projection_point(pt, project):
     lat, long = spherical_utils.get_lat_long(pt)
@@ -54,7 +55,7 @@ def projection_line(u, v, project):
 
 ### For Plotting Earth Map ###
 def read_coast_data():
-    file = open('../data/misc/world_coast.csv', 'r')
+    file = open('../data/world_coast.csv', 'r')
     coast = []
     
     for line in file:
@@ -163,3 +164,4 @@ def plot_outline(project):
         plt.axis([-np.pi, np.pi, -1, 1])
         plt.plot([-np.pi, np.pi, np.pi, -np.pi, -np.pi],
                  [1, 1, -1, -1, 1], 'b-')
+

@@ -4,72 +4,71 @@ import numpy as np
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import projections
-import densities
-import samples
+import sample_density
     
-def cvt_step(generators, trial_no, folder, samples, density):
+def cvt_step(generators, samples, density):#, folder, trial):
+    bin_pts, bin_den, energy = bin_points(generators, samples, density)
     mv = []
 
-    bins, energy = bin_points(generators, samples)
-     
     for i in range(0, len(generators)):
-        com, m = compute_center_of_mass(bins[i], density)
+        com, m = compute_center_of_mass(bin_pts[i], bin_den[i])
         generators[i] = spherical_utils.project_to_unit_sphere(com)
         mv.append(m)
 
-    plt.cla()
-    plt.plot(mv)
-    plt.savefig(folder + "/mass_vs_region_" + str(trial_no) + ".png")
+    return energy, mv
 
-    return energy, np.std(mv), np.mean(mv)
-     
-def compute_center_of_mass(b, density):
+def compute_center_of_mass(b, d):
     if len(b) == 0:
-        return samples.uniform_sample(1)[0], 0
+        return sample_density.uniform_sample(1)[0][0], 0
      
     x1 = 0
     y1 = 0
     z1 = 0
     m  = 0
      
-    for x in b:
-        lat, lon = spherical_utils.get_lat_long(x)
-        den = density[int(-(lat - 90)),int(lon + 180)]
+    for i in range(len(b)):
+        den = d[i]
         if den < 0:
             den = 0
-        #den = 1 - lam + lam * den
-
               
-        x1 += x[0] * den  
-        y1 += x[1] * den
-        z1 += x[2] * den
+        x1 += b[i][0] * den  
+        y1 += b[i][1] * den
+        z1 += b[i][2] * den
         m  += den
           
-    return np.array([x1,y1,z1])/m, m
+    com = np.array([x1,y1,z1])/m
+    return com, m
           
-def bin_points(generators, samples):
+def bin_points(generators, samples, density):
      
      # create M uniform test points
      x = samples
-     
-     bins = [ [] for x in range(len(generators))]
+     y = density
+
+     bin_pts = [ [] for x in range(len(generators))]
+     bin_den = [ [] for y in range(len(generators))]
+
      energy = 0
      
-     for xi in x:
+     for k in range(len(x)):
           
           d = math.inf
           bi = -1
           
           for i in range(0,len(generators)):
-               di = spherical_utils.distance_euclidean(xi,generators[i])# / den
+               di = spherical_utils.distance_euclidean(x[k],generators[i])# / den
                if (di < d):
                     d = di
                     bi = i
           
-          bins[bi].append(xi)
-          energy += spherical_utils.distance_euclidean(xi, generators[bi])
-          
-     return bins, energy
+          bin_pts[bi].append(x[k])
+          bin_den[bi].append(y[k])
+          energy += spherical_utils.distance_euclidean(x[k], generators[bi])**2
+     #for i in range(len(bin_pts)):
+     #   for j in range(len(bin_pts[i])):
+     #       print(spherical_utils.get_lat_long(bin_pts[i][j]), bin_den[i][j])
+
+     return bin_pts, bin_den, energy
 
 def plot_voronoi(ax, generators):
     tri_upp, tri_low, gen_upp, gen_low \

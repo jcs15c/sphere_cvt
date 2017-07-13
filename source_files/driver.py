@@ -1,59 +1,54 @@
+import sys
 import spherical_utils
 import spherical_cvt
-import samples
-import densities
+import sample_density
 from projections import *
 
-N = 100
-M = 10000
+its = 50
 
-folder = "../output/test"
+pts = int(sys.argv[2])
+trial = int(sys.argv[3])
+sampler = str(sys.argv[1])
 
-f = open(folder + "/test_energy.txt",'w')
-f.write("iteration\t\tenergy\t\tstandard dev\t\tmean\n")
+folder = sampler + '_' + str(pts)
 
-g = open(folder + "/document.txt",'w')
-g.write("Proportional sample for generators CHOSEN WITH FULL UNLOG'D DENSITY, Uniform sample points, Full, LOG'D density")
-g.close()
+f = open("../output/" + folder + "/trial_" + str(trial) + "/document.txt", 'w')
+f.write("iteration\t\tenergy\t\tstd dev\t\tmean\n")
 
-density = densities.get_den_array_log()
-density2 = densities.get_den_array()
-generators = samples.prop_sample(N, density2)
-sample = samples.uniform_sample(M)
+generators = sample_density.uniform_sample(50)[0]
 
-stdevs = []
-means = []
+if sampler == "lebedev":
+    sample, density = sample_density.get_lebedev()
+elif sampler == "fibonacci":
+    sample, density = sample_density.get_fibonacci(pts)
+elif sampler == "monte_carlo":
+    sample, density = sample_density.get_monte_carlo(pts)
+elif sampler == "helical":
+    sample, density = sample_density.get_helical(pts)
 
-for k in range(30):  
-    if k%5 == 0:
+stds = []
+mean = []
+
+for it in range(its + 1):
+    plt.cla()
+    coast = read_coast_data()
+    plot_coast_map(coast, lambert_cylindrical)
+    spherical_cvt.plot_voronoi_map(generators, lambert_cylindrical, True)
+    plt.axis([-3, 3, -2, 2])
+    energy, mv = spherical_cvt.cvt_step(generators, sample, density)#, folder, trial)
+    if it%5 == 0:
+        plt.savefig("../output/" + folder + "/trial_" + str(trial) + "/trial_" + str(it) + ".png")
         plt.cla()
-        coast = read_coast_data()
-        plot_coast_map(coast, lambert_cylindrical)
-        spherical_cvt.plot_voronoi_map(generators, lambert_cylindrical, True)
-        plt.axis([-3, 3, -2, 2])
-        plt.savefig(folder + '/iteration_' + str(k) + '.png', dpi=250)
-    
-    e, stdev, mean = spherical_cvt.cvt_step(generators, k, folder, sample, density)
-    stdevs.append(stdev)
-    means.append(mean)
-
-    f.write(str(k) + '\t\t' + str(e) + '\t\t' + str(stdev) +'\t\t' + str(mean) + '\n')
-        
-    
-plt.cla()
-coast = read_coast_data()
-plot_coast_map(coast, lambert_cylindrical)
-
-spherical_cvt.plot_voronoi_map(generators, lambert_cylindrical, True)
-plt.axis([-3, 3, -2, 2])
-plt.savefig(folder + '/iteration_30.png', dpi=500)
-
-f.close()
+        plt.plot(mv)
+        plt.savefig("../output/" + folder + "/trial_" + str(trial) + "/mv_" + str(it) + ".png")
+    f.write(str(it)+"\t\t"+str(energy)+"\t\t"+str(np.std(mv))+"\t\t"+str(np.mean(mv)) + '\n')
+    mean.append(np.mean(mv))
+    stds.append(np.std(mv))
 
 plt.cla()
-plt.plot(stdevs)
-plt.savefig(folder + '/stdevs.png')
+plt.plot(mean)
+plt.savefig("../output/" + folder + "/trial_" + str(trial) + "/means.png")
 
 plt.cla()
-plt.plot(means)
-plt.savefig(folder + '/means.png')
+plt.plot(stds)
+plt.savefig("../output/" + folder + "/trial_" + str(trial) + "/stds.png")
