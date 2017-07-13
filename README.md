@@ -11,8 +11,8 @@ By utilizing a series of projections between the sphere and tangent planes at it
 THe Voronoi diagram can be computed from the circumcenters of each of the Delaunay triangles. Circumcenters for adjacent triangles are connected, and the resulting image is the Voronoi Diagram
 
 ```python
-      generators = spherical_utils.uniform_sample(25)
-      sample = spherical_utils.uniform_sample(1000)
+      generators = sample_density.uniform_sample(25)[0]
+      sample, density = sample_density.uniform_sample(1000)
 
       ax = spherical_utils.init_sphere()
       spherical_utils.sphere_points(ax, generators)
@@ -27,8 +27,7 @@ THe Voronoi diagram can be computed from the circumcenters of each of the Delaun
       spherical_utils.disp_sphere(dx)
 
       for i in range(5):
-        #Third parameter governs density function, 0 for uniform
-        spherical_cvt.cvt_step(generators, 1000, 0)
+        spherical_cvt.cvt_step(generators, sample, density)
 
       bx = spherical_utils.init_sphere()    
       spherical_utils.sphere_points(bx, generators)
@@ -70,5 +69,9 @@ Because Python's 3D graphing functions are transparent, it is difficult to see t
 The following projections are from left to right, top to bottom: Mercator, Lambert Cylindrical, Albers Conal, Winkel Tripel
 
 ![Coast Map Projections](https://github.com/jcs15c/sphere_cvt/blob/master/output/examples/Map_Projections.png "Coast_Map_Projections")
+
+## Sampling Methods
+
+Due to the difficulties in applying a perfectly uniform grid on a sphere, we use several different approximations that are relatively easy to calculate. The followingi sample methods are, from left to right, top top bottom: Fibonaci Spiral, Helical Spiral, Monte Carlo, Lebedev (Limited to 1731 points)
 
 
