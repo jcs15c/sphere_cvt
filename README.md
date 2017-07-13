@@ -74,4 +74,10 @@ The following projections are from left to right, top to bottom: Mercator, Lambe
 
 Due to the difficulties in applying a perfectly uniform grid on a sphere, we use several different approximations that are relatively easy to calculate. The followingi sample methods are, from left to right, top top bottom: Fibonaci Spiral, Helical Spiral, Monte Carlo, Lebedev (Limited to 1731 points)
 
+![Sampler Example](https://github.com/jcs15c/sphere_cvt/blob/full_density/output/examples/Sampler_Example.png "Sampler_Example")
 
+## Global Density
+
+To perform a CVT on the Earth, a non-uniform density function needs to be used that reflects global population. NASA's Socoeconomic Data and Application Center population data gives the population density for each ~30 km^2 region on the Earth, on which a weighted CVT can be calculated. The following is a contour plot showing the log10 of this populatin data against latitude/longitude.
+
+![Density Example](https://github.com/jcs15c/sphere_cvt/blob/full_density/output/examples/Density_Example.png "Density_Example")
